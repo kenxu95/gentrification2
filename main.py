@@ -1,11 +1,10 @@
 import argparse
 import os
-import pandas as pd
-import time
 import numpy as np
 import sys
 from feature_extraction.featureExtraction import featureExtraction
 from model.svm import SVM
+from model.logistic import Logistic
 
 FEATURE_LOG = 'feature_extraction/images/featurelog'
 PREDICTIONS_LOG = 'predictionsLog'
@@ -15,16 +14,33 @@ class Harness(object):
     self.featureExtraction = featureExtraction()
     if model == 'svm':
       self.model = SVM()
+    elif model == 'logistic':
+      self.model = Logistic()
     else:
       print('no such model exists yet')
       1/0
 
-  # TODO: Reads the features from the feature logs into (samples, labels, testsamples, testlabels)
-  def readFeatureLogs(self)
-    return None, None, None, None
+  # Reads the features from the feature logs into (samples, labels, testsamples, testlabels)
+  def readFeatureLogs(self):
+    f = open(FEATURE_LOG)
+    data = []
+    for line in data:
+      data.append(line.strip().split(' '))
+    f.close()
+
+    # Get the random test samples
+    testingIndexes = random.sample(xrange(len(data)), 0.2 * len(data))
+    training = [x for i, x in data if i not in testingIndexes]
+    testing = [x for i, x in data if i in testingIndexes]
+
+    samples = [line[:-1] for line in training]
+    labels = [line[-1] for line in training]
+    testSamples = [line[:-1] for line in testing]
+    testlabels = [line[-1] for line in testing]
+    return samples, labels, testSamples, testlabels
 
   # Writes predictions to file
-  def writePredictions(self, predictions)
+  def writePredictions(self, predictions):
     f = open(PREDICTIONS_LOG, 'w')
     f.write(predictions)
     f.close()
@@ -53,7 +69,7 @@ class Harness(object):
       if label == predictions[idx]: numCorrect += 1
 
     print("Number of training examples: " + len(labels))
-    print("Success rate for trial: " +  float(numCorrect) / len(testlabels) + '. ' + numCorrect + 'out of ' + len(testlabels))
+    print("Success rate: " +  float(numCorrect) / len(testlabels) + '. ' + numCorrect + 'out of ' + len(testlabels))
 
     # Write the predictions to file
     self.writePredictions(self, predictions)

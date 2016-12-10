@@ -4,10 +4,13 @@ import urllib2
 import math
 from PIL import Image
 import StringIO
+from matplotlib import pyplot as plt
+from collections import defaultdict
 
 URL_PREFIX = "https://api.mapbox.com/v4/digitalglobe.nal0g75k/"
 URL_SUFFIX = ".png?access_token=pk.eyJ1IjoiZGlnaXRhbGdsb2JlIiwiYSI6ImNpdzhmNWFxMTAxd3IyeXBvdTB6dXZldWYifQ.MA1bofL4EsEJsKBUqmgUpg"
 SIZE = 256
+ZOOM_LEVEL = 16 # Default zoom level - can change if need be
 
 def downloadImage(z, x, y):
   url_args = str(z) + "/" + str(x) + "/" + str(y)
@@ -25,17 +28,19 @@ def xFromLon(z, lon):
 def yFromLat(z, lat):
   return int(math.floor(math.pow(2, z-1) * (1 - (math.log(math.tan(lat * math.pi / 180) + 1 / math.cos(lat * math.pi / 180))/ math.pi))))
 
-def downloadRegion(lon1, lat1, lon2, lat2, regionName):
-  z = 16 # Default zoom level - can change if need be
+def getTileIndexes(z, lon1, lat1, lon2, lat2):
   xstart = xFromLon(z, lon1)
   ystart = yFromLat(z, lat1)
   xend = xFromLon(z, lon2)
   yend = yFromLat(z, lat2)
-
-  if (xstart > xend):
+  if xstart > xend:
     xstart, xend = xend, xstart
-  if (ystart > yend):
+  if ystart > yend:
     ystart, yend = yend, ystart
+  return xstart, ystart, xend, yend
+
+def downloadRegion(lon1, lat1, lon2, lat2, regionName):
+  xstart, ystart, xend, yend = getTileIndexes(ZOOM_LEVEL, lon1, lat1, lon2, lat2)
 
   # Piece the images together
   numWidth = xend - xstart + 1
@@ -46,17 +51,57 @@ def downloadRegion(lon1, lat1, lon2, lat2, regionName):
       img.paste(downloadImage(z, x + xstart, y + ystart), (x * SIZE, y * SIZE))
   img.save(regionName + ".png")
 
+# ASSESS HOW MANY IMAGES ARE NEEDED
+# Helper function: Counts the number of tiles needed for a particular long/lat box
+def numTiles(lon1, lat1, lon2, lat2):
+  xstart, ystart, xend, yend = getTileIndexes(ZOOM_LEVEL, lon1, lat1, lon2, lat2)
+  return (xend - xstart + 1) * (yend - ystart + 1)
 
-# CODE START
-longitude1 = float(sys.argv[1])
-latitude1 = float(sys.argv[2])
-longitude2 = float(sys.argv[3])
-latitude2 = float(sys.argv[4])
-outputName = sys.argv[5]
-if (len(sys.argv) == 4):
-  downloadRegion(float(sys.argv[1]), float(sys.argv[2]), float(sys.argv[1]), float(sys.argv[2]), sys.argv[3])
-else:
-  downloadRegion(float(sys.argv[1]), float(sys.argv[2]), float(sys.argv[3]), float(sys.argv[4]), sys.argv[5])
+def calcNumTilesNeeded():
+  f = open('zipcode-geo.csv')
+  numLines = 0
+  tiles = []
+  f.readline() # Header line
+  for line in f:
+    lat1, lon1, lat2, lon2 = [float(x.strip()) for x in line.split(',')[-4:]]
+    numLines = numLines + 1 
+    tiles.append(numTiles(lon1, lat1, lon2, lat2))
+  f.close()
+
+  tiles.sort()
+  print "Total number of tiles needed: " + str(sum(tiles))
+  print "Average number of tiles needed: " + str(sum(tiles) / numLines)
+  print "Median of tiles per zip code: " + str(tiles[len(tiles) / 2])
+
+  tiles = [0.302 * x for x in tiles]
+  tilesHist = defaultdict(int)
+  for elem in tiles:
+    tilesHist[elem - (elem % 10)] += 1
+
+  xAxes = [x for x in sorted(tilesHist.keys()) if x < 250]
+  yAxes = []
+  for x in xAxes:
+    yAxes.append(tilesHist[x])
+
+  plt.figure()
+  plt.title("Distribution of Zip Code Sizes in USA")
+  plt.xlabel("Square Miles")
+  plt.ylabel("# of Zip Codes")
+  plt.plot(xAxes, yAxes)
+  plt.show()
+
+calcNumTilesNeeded()
+
+# # CODE START
+# longitude1 = float(sys.argv[1])
+# latitude1 = float(sys.argv[2])
+# longitude2 = float(sys.argv[3])
+# latitude2 = float(sys.argv[4])
+# outputName = sys.argv[5]
+# if (len(sys.argv) == 4):
+#   downloadRegion(float(sys.argv[1]), float(sys.argv[2]), float(sys.argv[1]), float(sys.argv[2]), sys.argv[3])
+# else:
+#   downloadRegion(float(sys.argv[1]), float(sys.argv[2]), float(sys.argv[3]), float(sys.argv[4]), sys.argv[5])
 
 
 
