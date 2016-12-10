@@ -4,7 +4,7 @@ import numpy
 from edgeExtractor import EdgeExtractor
 from colorHistogram import ColorHistogram
 # from shapeExtractor import ShapeExtractor
-from textureExtractor import textureExtractor
+from textureExtractor import TextureExtractor
 
 imagename = sys.argv[1]
 img = cv2.imread('images/' + imagename + '.png') #cv2.CV_8UC1
@@ -32,7 +32,7 @@ elif procedure == 'colors':
   features = colorHist.getFeatures(img)
   
 elif procedure == 'textures':
-  textures = textureExtractor()
+  textures = TextureExtractor()
   features = textures.getFeatures(img)
 
 
