@@ -28,7 +28,6 @@ def writeFeatures():
 
   # For every image, extract the features and write them to feature log
   count = 0
-  lines = []
   for filename in os.listdir(os.path.join(os.path.dirname(__file__), 'images')):
     if filename.endswith('.png'):
       imgpath = os.path.join(os.path.dirname(__file__), 'images', filename)
@@ -42,14 +41,10 @@ def writeFeatures():
       for elem in features:
         line += str(elem) + ' '
       line += str(labels[int(os.path.splitext(filename)[0])])
-      lines.append(line)
+      output.write(line + '\n')
+
       count = count + 1
       print "Wrote " + str(count) + " feature vectors: (" + os.path.splitext(filename)[0] + ")"
-
-  # Write the feature vectors to file (scrambled)
-  random.shuffle(lines)
-  for line in lines:
-    output.write(line + '\n')
   output.close()
 
 
