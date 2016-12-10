@@ -3,7 +3,7 @@ import os
 
 class textureExtractor():
     
-    def getFeatures(self, img, imagename=None, callback=None):
+    def getFeatures(self, img):
         #perform texture extraction
         
         # Choose different blurring techniques
