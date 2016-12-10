@@ -2,16 +2,18 @@ import argparse
 import os
 import numpy as np
 import sys
-from feature_extraction.featureExtraction import featureExtraction
+# import random
 from model.svm import SVM
 from model.logistic import Logistic
+from matplotlib import pyplot as plt
 
-FEATURE_LOG = 'feature_extraction/images/featurelog'
+NUM_TRAINING = [10, 50, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600]
+NUM_TESTING = 100
+FEATURE_LOG = 'feature_extraction/logs/featurelog'
 PREDICTIONS_LOG = 'predictionsLog'
 
 class Harness(object):
   def __init__(self, model):
-    self.featureExtraction = featureExtraction()
     if model == 'svm':
       self.model = SVM()
     elif model == 'logistic':
@@ -24,60 +26,79 @@ class Harness(object):
   def readFeatureLogs(self):
     f = open(FEATURE_LOG)
     data = []
-    for line in data:
-      data.append(line.strip().split(' '))
+    for line in f:
+      data.append([float(x) for x in line.strip().split(' ')])
     f.close()
 
-    # Get the random test samples
-    testingIndexes = random.sample(xrange(len(data)), 0.2 * len(data))
-    training = [x for i, x in data if i not in testingIndexes]
-    testing = [x for i, x in data if i in testingIndexes]
+    def getLabel(pop_density):
+      if pop_density < 1000:
+        return 1
+      else:
+        return 2
 
-    samples = [line[:-1] for line in training]
-    labels = [line[-1] for line in training]
-    testSamples = [line[:-1] for line in testing]
-    testlabels = [line[-1] for line in testing]
-    return samples, labels, testSamples, testlabels
+    # Get the random test samples
+    # random.shuffle(data)
+
+    xAxis = []
+    yAxis = []
+    testing = data[-NUM_TESTING:] # Testing data stays constant
+    for num_training in NUM_TRAINING:
+      training = data[:num_training]
+
+      samples = np.array([line[1:-1] for line in training])
+      labels = np.array([getLabel(line[-1]) for line in training])
+      testsamples = ([line[1:-1] for line in testing])
+      testlabels = ([getLabel(line[-1]) for line in testing])
+
+      print('Training...')
+      try: self.model.train(samples, labels)
+      except: 
+        print 'Failed to train model', sys.exc_info()[0]
+        return -1, 0
+        
+      print('Predicting...')
+      try: predictions = self.model.predict(testsamples)
+      except: 
+        print 'Failed prediction', sys.exc_info()[0]
+        return -1, 0
+
+      print('Evaluating...')
+      numCorrect = 0
+      for idx, label in enumerate(testlabels):
+        if label == predictions[idx]: numCorrect += 1
+
+      xAxis.append(str(len(labels)))
+      yAxis.append(str(float(numCorrect) / len(testlabels)))
+      print "Number of training examples: " + str(len(labels))
+      print "Success rate: " +  str(float(numCorrect) / len(testlabels)) + '. ' + str(numCorrect) + ' out of ' + str(len(testlabels))
+
+    # Write the predictions to file
+    # self.writePredictions(predictions)
+    plt.figure()
+    plt.title("Learning Curve for Thresholded Population Density (3 features)")
+    plt.xlabel("# of Training Examples")
+    plt.ylabel("Success Rate")
+    plt.ylim([0, 1])
+    plt.plot(xAxis, yAxis)
+    plt.show()
 
   # Writes predictions to file
   def writePredictions(self, predictions):
     f = open(PREDICTIONS_LOG, 'w')
-    f.write(predictions)
+    for prediction in predictions:
+      f.write(str(predictions) + '\n\n')
     f.close()
 
   def run(self):
     # Write all the features and labels to log file
-    print("Extracting features...")
-    featureExtraction.writeFeatures()
-    samples, labels, testsamples, testlabels = self.readFeatureLogs()
+    print("Reading features...")
+    self.readFeatureLogs() # AND TEST
 
-    print('Training...')
-    try: classifier.train(samples, responses)
-    except: 
-      print 'Failed to train model', sys.exc_info()[0]
-      return -1, 0
-      
-    print('Predicting...')
-    try: predictions = classifier.predict(testsamples)
-    except: 
-      print 'Failed prediction', sys.exc_info()[0]
-      return -1, 0
-
-    print('Evaluating...')
-    numCorrect = 0
-    for idx, label in enumerate(testlabels):
-      if label == predictions[idx]: numCorrect += 1
-
-    print("Number of training examples: " + len(labels))
-    print("Success rate: " +  float(numCorrect) / len(testlabels) + '. ' + numCorrect + 'out of ' + len(testlabels))
-
-    # Write the predictions to file
-    self.writePredictions(self, predictions)
 
 ##### END OF HARNESS CLASS #########
 
 parser = argparse.ArgumentParser()
-parser.add_argment('model', choices=['svm', 'logistic'])
+parser.add_argument('model', choices=['svm', 'logistic'])
 args = parser.parse_args()
 
 if __name__ == "__main__":

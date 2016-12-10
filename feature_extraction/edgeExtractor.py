@@ -23,7 +23,7 @@ class EdgeExtractor():
         contours, hierachy = cv2.findContours(edges, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
         totalArea = img.shape[0] * img.shape[1]
         features.append(sum([cv2.contourArea(cnt) for cnt in contours]) / totalArea)
-        features.append(sum([cv2.arcLength(cnt) for cnt in contours]) / totalArea)
+        features.append(sum([cv2.arcLength(cnt, True) for cnt in contours]) / totalArea)
 
         return features
         

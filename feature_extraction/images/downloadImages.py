@@ -39,7 +39,7 @@ def getTileIndexes(z, lon1, lat1, lon2, lat2):
     ystart, yend = yend, ystart
   return xstart, ystart, xend, yend
 
-def downloadRegion(lon1, lat1, lon2, lat2, regionName):
+def downloadRegion(z, lon1, lat1, lon2, lat2, regionName):
   xstart, ystart, xend, yend = getTileIndexes(ZOOM_LEVEL, lon1, lat1, lon2, lat2)
 
   # Piece the images together
@@ -51,6 +51,35 @@ def downloadRegion(lon1, lat1, lon2, lat2, regionName):
       img.paste(downloadImage(z, x + xstart, y + ystart), (x * SIZE, y * SIZE))
   img.save(regionName + ".png")
 
+# IMPORTANT: Downloads a bunch of images!!
+def downloadImages():
+  f = open('labels.csv')
+  lines = []
+  f.readline()
+  for line in f:
+    lines.append([float(x.strip()) for x in line.split(',')])
+  f.close()
+
+  # Sort by size
+  def sortByTile(elem):
+    return numTiles(elem[-3], elem[-4], elem[-1], elem[-2])
+  lines.sort(key=sortByTile)
+
+  # DOWNLOAD THE IMAGES IN THE FILE
+  for i in xrange(len(lines)):
+    if i > 508 and i <= 1000:
+      lat1, lon1, lat2, lon2 = lines[i][-4:]
+      downloadRegion(ZOOM_LEVEL, lon1, lat1, lon2, lat2, str(int(lines[i][0])))
+      print str(i) + "th zip code has been downloaded!"
+
+  # numTilesArr = []
+  # for i in xrange(len(lines)):
+  #   if i < 1000:
+  #     lat1, lon1, lat2, lon2 = lines[i][-4:]
+  #     numTilesArr.append(numTiles(lon1, lat1, lon2, lat2))
+  # print "Num tiles needed: " + str(sum(numTilesArr))
+
+
 # ASSESS HOW MANY IMAGES ARE NEEDED
 # Helper function: Counts the number of tiles needed for a particular long/lat box
 def numTiles(lon1, lat1, lon2, lat2):
@@ -58,7 +87,7 @@ def numTiles(lon1, lat1, lon2, lat2):
   return (xend - xstart + 1) * (yend - ystart + 1)
 
 def calcNumTilesNeeded():
-  f = open('zipcode-geo.csv')
+  f = open('labels.csv')
   numLines = 0
   tiles = []
   f.readline() # Header line
@@ -83,14 +112,15 @@ def calcNumTilesNeeded():
   for x in xAxes:
     yAxes.append(tilesHist[x])
 
-  plt.figure()
-  plt.title("Distribution of Zip Code Sizes in USA")
-  plt.xlabel("Square Miles")
-  plt.ylabel("# of Zip Codes")
-  plt.plot(xAxes, yAxes)
-  plt.show()
+  # plt.figure()
+  # plt.title("Distribution of Zip Code Sizes in USA")
+  # plt.xlabel("Square Miles")
+  # plt.ylabel("# of Zip Codes")
+  # plt.plot(xAxes, yAxes)
+  # plt.show()
 
-calcNumTilesNeeded()
+# calcNumTilesNeeded()
+downloadImages()
 
 # # CODE START
 # longitude1 = float(sys.argv[1])
