@@ -1,7 +1,7 @@
 import cv2
 import os
 
-class textureExtractor():
+class TextureExtractor():
     
     def getFeatures(self, img):
         #perform texture extraction
