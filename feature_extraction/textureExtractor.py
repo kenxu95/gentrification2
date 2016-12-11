@@ -13,6 +13,8 @@ class TextureExtractor():
         img = cv2.cvtColor( img, cv2.COLOR_RGB2GRAY )
         
         # Choose different blurring techniques
+        # Blur image components
+        # img = cv2.medianBlur(img, 5)
         # reduce unwanted noise
         features = cv2.bilateralFilter(img, 9, 75, 75)
             
