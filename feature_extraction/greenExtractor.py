@@ -2,18 +2,16 @@ import numpy as np
 import cv2
 
 class GreenExtractor():
-	def __init__(self, minVal, maxVal, aperture_size):
-		self.minVal = minVal
-		self.maxVal = maxVal
-		self.aperture_size = aperture_size
+	def __init__(self):
+		pass
 
 	def getFeatures(self, img, imagename=None, callback=None):
 		# For debugging
 		if callback:
-            callback(edges, imagename)
+			callback(edges, imagename)
 
 		# Convert BGR to HSV
-		hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+		hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 		 
 		# define range of blue color in HSV
 		lower_blue = np.array([50,100,100])
@@ -23,11 +21,11 @@ class GreenExtractor():
 		mask = cv2.inRange(hsv, lower_blue, upper_blue)
 		 
 		# Bitwise-AND mask and original image
-		res = cv2.bitwise_and(frame,frame, mask= mask) 
+		res = cv2.bitwise_and(img, img, mask = mask) 
 
-		cv2.imshow('frame',frame)
-		cv2.imshow('mask',mask)
-		cv2.imshow('res',res)
+		cv2.imshow('frame', img)
+		cv2.imshow('mask', mask)
+		cv2.imshow('res', res)
 		cv2.waitKey(5)
 		 
 		cv2.destroyAllWindows()
