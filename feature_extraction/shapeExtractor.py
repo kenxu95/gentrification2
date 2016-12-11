@@ -4,6 +4,7 @@ import cv2
 import math
 import operator
 
+# Deprecated - incorporated into edgeExtractor
 # TODO: More fancy shapes?
 class ShapeExtractor():
     def __init__(self):
