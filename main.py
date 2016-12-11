@@ -40,7 +40,7 @@ class Harness(object):
     xAxis = []
     yAxis = []
     plt.figure()
-    plt.title("Learning Curve for Thresholded Population Density (3 features)")
+    plt.title("LC for Population Density (edge/shape/corner/color histogram)")
     plt.xlabel("# of Training Examples")
     plt.ylabel("Success Rate")
     plt.ylim([0.4, 0.8])
@@ -53,9 +53,9 @@ class Harness(object):
       for num_training in NUM_TRAINING:
         training = data[:num_training]
 
-        samples = np.array([line[1:4] for line in training])
+        samples = np.array([line[1:-1] for line in training])
         labels = np.array([getLabel(line[-1]) for line in training])
-        testsamples = ([line[1:4] for line in testing])
+        testsamples = ([line[1:-1] for line in testing])
         testlabels = ([getLabel(line[-1]) for line in testing])
 
         print('Training...')

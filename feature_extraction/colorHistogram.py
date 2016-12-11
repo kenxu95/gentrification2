@@ -41,8 +41,11 @@ class ColorHistogram():
       sumc1 = sum(c1)
       sumc2 = sum(c2)
       sumc3 = sum(c3)
-      return [x / sumc1 for x in c1] + [x / sumc2 for x in c2] + [x / sumc3 for x in c3]
 
+      features1 = [int(x > (sumc1 / 16)) for x in c1]
+      features2 = [int(x > (sumc2 / 16)) for x in c2]
+      features3 = [int(x > (sumc3 / 16)) for x in c3]      
+      return features1 + features2 + features3 
 
       # for i in xrange(lenHist):
       #   total = allBins[i][1] + allBins[i + lenHist][1] + allBins[i + 2 * lenHist][1]

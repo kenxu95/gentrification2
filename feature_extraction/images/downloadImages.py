@@ -120,18 +120,18 @@ def calcNumTilesNeeded():
   # plt.show()
 
 # calcNumTilesNeeded()
-downloadImages()
+# downloadImages()
 
-# # CODE START
-# longitude1 = float(sys.argv[1])
-# latitude1 = float(sys.argv[2])
-# longitude2 = float(sys.argv[3])
-# latitude2 = float(sys.argv[4])
-# outputName = sys.argv[5]
-# if (len(sys.argv) == 4):
-#   downloadRegion(float(sys.argv[1]), float(sys.argv[2]), float(sys.argv[1]), float(sys.argv[2]), sys.argv[3])
-# else:
-#   downloadRegion(float(sys.argv[1]), float(sys.argv[2]), float(sys.argv[3]), float(sys.argv[4]), sys.argv[5])
+# CODE START
+longitude1 = float(sys.argv[1])
+latitude1 = float(sys.argv[2])
+longitude2 = float(sys.argv[3])
+latitude2 = float(sys.argv[4])
+outputName = sys.argv[5]
+if (len(sys.argv) == 4):
+  downloadRegion(ZOOM_LEVEL, float(sys.argv[1]), float(sys.argv[2]), float(sys.argv[1]), float(sys.argv[2]), sys.argv[3])
+else:
+  downloadRegion(ZOOM_LEVEL, float(sys.argv[1]), float(sys.argv[2]), float(sys.argv[3]), float(sys.argv[4]), sys.argv[5])
 
 
 

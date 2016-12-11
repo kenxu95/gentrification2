@@ -29,7 +29,7 @@ def writeFeatures():
   # For every image, extract the features and write them to feature log
   count = 0
   for filename in os.listdir(os.path.join(os.path.dirname(__file__), 'images')):
-    if filename.endswith('.png'):
+    if filename.endswith('.png') and os.path.splitext(filename)[0] != 'Stanford':
       imgpath = os.path.join(os.path.dirname(__file__), 'images', filename)
       img = cv2.imread(imgpath)
       features = []
