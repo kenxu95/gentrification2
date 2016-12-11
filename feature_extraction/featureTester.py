@@ -37,7 +37,9 @@ elif procedure == 'textures':
   features = textures.getFeatures(img)
 
 elif procedure == 'green':
+  def greenCallback(img, imagename):
+    cv2.imwrite('images/' + imagename + 'Green.png', img)
   greenExtractor = GreenExtractor()
-  features = greenExtractor.getFeatures(img)
+  features = greenExtractor.getFeatures(img, imagename, greenCallback)
 
 print features
