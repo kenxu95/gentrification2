@@ -8,7 +8,6 @@ class GreenExtractor():
 	def getFeatures(self, img, imagename=None, callback=None):
 		# For debugging
 		
-
 		# Convert BGR to HSV
 		hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 		 
@@ -23,9 +22,9 @@ class GreenExtractor():
 		res = cv2.bitwise_and(img, img, mask = mask) 
 
 		if callback:
-			callback(img, 'original')
-			callback(mask, 'mask')
-			callback(res, 'res')
+			callback(img, imagename + 'orig')
+			callback(mask, imagename + 'mask')
+			callback(res, imagename + 'res')
 
 		# cv2.imshow('frame', img)
 		# cv2.imshow('mask', mask)
@@ -34,12 +33,28 @@ class GreenExtractor():
 		 
 		# cv2.destroyAllWindows()
 
-		width = img.shape[0]
-		height = img.shape[1]
-		area = width * height
-		greenPixelCount = 0
-		for x in range(width):
-			for y in range(height):
-				greenPixelCount += mask[x][y]/255
-		features = [greenPixelCount/float(area)]
+		width = mask.shape[0]
+		height = mask.shape[1]
+		totalArea = float(width * height)
+		features = [cv2.sumElems(mask)[0] / (255 * totalArea)]
+
+		sixteenths = [0] * 16
+		for x in xrange(4): # width
+			for y in xrange(4): # height
+				start_x = x * (width / 4)
+				end_x = start_x + (width / 4)
+				start_y = y * (height / 4)
+				end_y = start_y + (height / 4)
+
+				sixteenths[4 * x + y] = cv2.sumElems(mask[start_x : end_x, start_y : end_y])[0] / (255 * totalArea / 16)
+
+		features.extend(sixteenths)
+
+		# for x in xrange(width):
+		# 	for y in xrange(height):
+		# 		x_idx = x / (width / 4)
+		# 		y_idx = y / (height / 4)
+		# 		sixteenths[x_idx + y_idx * 4] += mask[x][y] / 255
+		# features.extend([x / (float(totalArea) / 16) for x in sixteenths])	
+
 		return features

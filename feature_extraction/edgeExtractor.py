@@ -34,18 +34,21 @@ class EdgeExtractor():
         # CORNER: Run the Corner Harris algorithm on both edges and original image
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         corner_img = cv2.cornerHarris(gray, 2, 3, 0.04)
-        # img[processed_img > 0.01 * processed_img.max()] = [0, 0, 255] # FOR DISPLAYING
+        corner_edges = cv2.cornerHarris(edges, 2, 3, 0.04)
+        edges = cv2.cvtColor(edges, cv2.COLOR_GRAY2RGB)
+        edges[corner_edges > 0.01 * corner_edges.max()] = [0, 0, 255] # FOR DISPLAYING
 
         # The indexes of the corners within the images 
         corner_img_indexes = np.where(corner_img > 0.01 * corner_img.max())
+        corner_edges_indexes = np.where(corner_edges > 0.01 * corner_edges.max())
 
         # Add number of corners
         num_img_corners = len(corner_img_indexes[0])
-        features.append(num_img_corners)
+        features.append(num_img_corners / totalArea)
+        features.append(len(corner_edges_indexes[0]) / totalArea)
 
-        # For debugging
         if callback:
-            callback(img, imagename) 
+            callback(edges, imagename)
 
         return features
         

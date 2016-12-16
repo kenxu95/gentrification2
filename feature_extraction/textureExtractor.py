@@ -2,6 +2,8 @@ import cv2
 import os
 
 class TextureExtractor():
+    def __init__(self):
+        pass
     
     def getFeatures(self, img, imagename = None, callback = None):
         #perform texture extraction
@@ -16,10 +18,10 @@ class TextureExtractor():
         # Blur image components
         # img = cv2.medianBlur(img, 5)
         # reduce unwanted noise
-        features = cv2.bilateralFilter(img, 9, 75, 75)
+        textures = cv2.bilateralFilter(img, 9, 75, 75)
             
         # Choose different thresholding techniques
-        features = cv2.adaptiveThreshold(img,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY,25,20)
+        textures = cv2.adaptiveThreshold(img,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY,25,20)
         # _, img = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
         
         # Texture feature                                                                                                                                             
@@ -35,7 +37,7 @@ class TextureExtractor():
 
 
         if callback:
-            callback(origim, imagename, contours)
+            callback(textures, imagename, contours)
 
         # cv2.imwrite('test11.png', textures)
 

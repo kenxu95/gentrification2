@@ -1,4 +1,4 @@
-# from matplotlib import pyplot as plt
+from matplotlib import pyplot as plt
 import numpy as np
 import cv2
 
@@ -22,8 +22,8 @@ class ColorHistogram():
         lenHist = len(hist)
         allBins.extend(hist)
 
-        # plt.plot(hist, color=color)
-        # plt.xlim([0, 256])
+      #   plt.plot(hist, color=color)
+      #   plt.xlim([0, 256])
       # plt.show()
 
       allBins = [elem[0] for elem in allBins]
