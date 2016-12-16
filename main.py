@@ -6,6 +6,7 @@ import random
 from model.svm import SVM
 from model.logistic import Logistic
 from model.randomForest import RandomForest
+from model.linearDiscAnalysis import LinearDiscAnalysis
 from matplotlib import pyplot as plt
 from feature_extraction.getLabelStats import getMedianLabel
 
@@ -23,6 +24,8 @@ class Harness(object):
       self.model = Logistic()
     elif model == 'randomForest':
       self.model = RandomForest()
+    elif model == 'linearDisc':
+      self.model = LinearDiscAnalysis()
     else:
       print('no such model exists yet')
       1/0
@@ -49,7 +52,7 @@ class Harness(object):
     plt.title("CHANGEME")
     plt.xlabel("# of Training Examples")
     plt.ylabel("Success Rate")
-    plt.ylim([0.5, 0.8])
+    plt.ylim([0.15, 0.3])
 
     false1s = []
     false2s = []
@@ -72,8 +75,8 @@ class Harness(object):
       for num_training in NUM_TRAINING:
         training = data[:num_training]
 
-        NUM_LABELS = 7
-        LABEL_IDX = -2
+        NUM_LABELS = 10
+        LABEL_IDX = -10
         samples = np.array([line[1:-NUM_LABELS] for line in training])
         labels = np.array([line[LABEL_IDX] for line in training])
         testsamples = ([line[1:-NUM_LABELS] for line in testing])
@@ -94,8 +97,8 @@ class Harness(object):
           for idx, label in enumerate(labels):
             if label == training_predictions[idx]:
               numTrainingCorrect += 1
-            elif abs(label - training_predictions[idx]) <= 1:
-              numTrainingCorrect += 1
+            # elif abs(label - training_predictions[idx]) <= 1:
+              # numTrainingCorrect += 1
 
             # deviation += abs(label - training_predictions[idx])
             # numDeviation += 1
@@ -116,8 +119,8 @@ class Harness(object):
         for idx, label in enumerate(testlabels):
           if label == predictions[idx]: 
             numCorrect += 1
-          elif abs(label - predictions[idx]) <= 1:
-            numCorrect += 1
+          # elif abs(label - predictions[idx]) <= 1:
+            # numCorrect += 1
 
         xAxis[NUM_TRAINING.index(num_training)] = str(len(labels))
         yAxis[NUM_TRAINING.index(num_training)] += float(numCorrect) / len(testlabels)
@@ -132,8 +135,6 @@ class Harness(object):
 
     print "Success rate training: " + ", ".join([str(x) for x in training_success])
     # print "Average deviation: " + str(float(deviation) / numDeviation)
-
-
 
   # Writes predictions to file
   def writePredictions(self, predictions):
@@ -151,7 +152,7 @@ class Harness(object):
 ##### END OF HARNESS CLASS #########
 
 parser = argparse.ArgumentParser()
-parser.add_argument('model', choices=['svm', 'logistic', 'randomForest'])
+parser.add_argument('model', choices=['svm', 'logistic', 'randomForest', 'linearDisc'])
 args = parser.parse_args()
 
 if __name__ == "__main__":

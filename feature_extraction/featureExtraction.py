@@ -48,9 +48,13 @@ def getLabelData():
 
   # Split all the non-gentrification values into top 50% and bottom 50%
   for i in xrange(len(labels[0])):
-    thresh = calcThreshold(labels, i)
-    for line in labels:
-      line[i] = str(1) if line[i] < thresh else str(2)
+    if i == 0:
+      for line in labels:
+        line[i] = str(line[i])
+    else:
+      thresh = calcThreshold(labels, i)
+      for line in labels:
+        line[i] = str(1) if line[i] < thresh else str(2)
   return labels
 
 def writeFeatures():
