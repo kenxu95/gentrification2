@@ -1,5 +1,7 @@
 import numpy as np 
 import cv2
+import matplotlib.pyplot as plt
+
 
 class SIFTExtractor():
     def __init__(self):
@@ -11,39 +13,33 @@ class SIFTExtractor():
 
         sift = cv2.SIFT() #features2d.SIFT_create()
         kp, des = sift.detectAndCompute(gray, None)
-    
-        img2 = cv2.drawKeypoints(gray,kp)
-        print kp[0]
-        print des[0]
+        
+        width = img.shape[0]
+        height = img.shape[1]
+        totalArea = float(width * height)
+        features = [len(kp) / totalArea] # keypoint density
+
+        sizes = [kpt.size for kpt in kp]
+        octaves = [kpt.octave for kpt in kp]
+
+        size_hist, _ = np.histogram(sizes, bins=10, range=(10,100))
+        size_hist_sz = sum(size_hist)
+        size_hist = [bar_height/float(size_hist_sz) for bar_height in size_hist]
+        features.extend(size_hist)
+
+        octaves_hist, _ = np.histogram(octaves, bins=10)
+        octaves_hist_sz = sum(octaves_hist)
+        octaves_hist = [bar_height/float(octaves_hist_sz) for bar_height in octaves_hist]
+        features.extend(octaves_hist)
+
+        # plt.hist(sizes, bins=10, range=(10,100), normed=True)  # plt.hist passes it's arguments to np.histogram
+        # plt.title("Sizes")
+        # plt.savefig(imagename + '-SIFT-size-histogram')
+
+        img2 = cv2.drawKeypoints(gray,kp,flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
 
         # For debugging
         if callback:
             callback(img2, imagename + 'keypoints')
         
-        return []
-
-        # width = mask.shape[0]
-        # height = mask.shape[1]
-        # totalArea = float(width * height)
-        # features = [cv2.sumElems(mask)[0] / (255 * totalArea)]
-
-        # sixteenths = [0] * 16
-        # for x in xrange(4): # width
-        #     for y in xrange(4): # height
-        #         start_x = x * (width / 4)
-        #         end_x = start_x + (width / 4)
-        #         start_y = y * (height / 4)
-        #         end_y = start_y + (height / 4)
-
-        #         sixteenths[4 * x + y] = cv2.sumElems(mask[start_x : end_x, start_y : end_y])[0] / (255 * totalArea / 16)
-
-        # features.extend(sixteenths)
-
-        # # for x in xrange(width):
-        # #   for y in xrange(height):
-        # #       x_idx = x / (width / 4)
-        # #       y_idx = y / (height / 4)
-        # #       sixteenths[x_idx + y_idx * 4] += mask[x][y] / 255
-        # # features.extend([x / (float(totalArea) / 16) for x in sixteenths])    
-
-        # return features
+        return features
