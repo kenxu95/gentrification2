@@ -6,13 +6,15 @@ from edgeExtractor import EdgeExtractor
 from colorHistogram import ColorHistogram
 from textureExtractor import TextureExtractor
 from greenExtractor import GreenExtractor
+from siftExtractor import SIFTExtractor
 
 FEATURE_LOG = 'logs/featurelog'
 FEATURE_EXTRACTORS = [
-  EdgeExtractor(100, 500, 1),
-  ColorHistogram(),
-  TextureExtractor(),
-  GreenExtractor()
+#  EdgeExtractor(100, 500, 1),
+ # ColorHistogram(),
+ # TextureExtractor(),
+  GreenExtractor(),
+  SIFTExtractor()
 ]
 
 def convertToFloat(x):

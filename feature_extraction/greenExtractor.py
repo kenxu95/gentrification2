@@ -6,7 +6,6 @@ class GreenExtractor():
 		pass
 
 	def getFeatures(self, img, imagename=None, callback=None):
-		# For debugging
 		
 		# Convert BGR to HSV
 		hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
@@ -21,18 +20,12 @@ class GreenExtractor():
 		# Bitwise-AND mask and original image
 		res = cv2.bitwise_and(img, img, mask = mask) 
 
+		# For debugging
 		if callback:
 			callback(img, imagename + 'orig')
 			callback(mask, imagename + 'mask')
 			callback(res, imagename + 'res')
-
-		# cv2.imshow('frame', img)
-		# cv2.imshow('mask', mask)
-		# cv2.imshow('res', res)
-		# cv2.waitKey(5)
 		 
-		# cv2.destroyAllWindows()
-
 		width = mask.shape[0]
 		height = mask.shape[1]
 		totalArea = float(width * height)

@@ -6,6 +6,7 @@ from colorHistogram import ColorHistogram
 # from shapeExtractor import ShapeExtractor
 from textureExtractor import TextureExtractor
 from greenExtractor import GreenExtractor
+from siftExtractor import SIFTExtractor
 
 imagename = sys.argv[1]
 img = cv2.imread('images/' + imagename + '.png') #cv2.CV_8UC1
@@ -50,5 +51,11 @@ elif procedure == 'green':
     cv2.imwrite('images/' + imagename + 'Green.png', img)
   greenExtractor = GreenExtractor()
   features = greenExtractor.getFeatures(img, imagename, greenCallback)
+
+elif procedure == 'sift':
+  def siftCallback(img, imagename):
+    cv2.imwrite('images/' + imagename + 'SIFT.png', img)
+  siftExtractor = SIFTExtractor()
+  features = siftExtractor.getFeatures(img, imagename, siftCallback)
 
 print features
